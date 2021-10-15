@@ -1,37 +1,134 @@
 import numpy as np
+from scipy import signal 
+import emd
+from scipy import stats
 
-def generate_features(implementation_version, draw_graphs, raw_data, axes, sampling_freq, scale_axes):
-    # features is a 1D array, reshape so we have a matrix
+# retrieve the next imf of the input signal. Use this on the prior computed imf or base signal
+def get_next_imf(x, zoom=None, sd_thresh=0.1):
+    proto_imf = x.copy()  # Take a copy of the input so we don't overwrite anything
+    continue_sift = True  # Define a flag indicating whether we should continue sifting
+    niters = 0            # An iteration counter
+
+    if zoom is None:
+        zoom = (0, x.shape[0])
+
+    # Main loop - we don't know how many iterations we'll need so we use a ``while`` loop
+    while continue_sift:
+        niters += 1  # Increment the counter
+
+        # Compute upper and lower envelopes
+        upper_env = emd.utils.interp_envelope(proto_imf, mode='upper')
+        lower_env = emd.utils.interp_envelope(proto_imf, mode='lower')
+
+        # Compute average envelope
+        avg_env = (upper_env+lower_env) / 2
+
+        # Should we stop sifting?
+        stop, val = emd.sift.sd_stop(proto_imf-avg_env, proto_imf, sd=sd_thresh)
+
+        # Remove envelope from proto IMF
+        proto_imf = proto_imf - avg_env
+
+        # and finally, stop if we're stopping
+        if stop:
+            continue_sift = False
+
+    # Return extracted IMF
+    return proto_imf
+
+def frequency_domain_graph_y(sampling_freq, lenX):
+    N = lenX
+    T = 1 / sampling_freq
+    freq_space = np.linspace(0.0, 1.0/(2.0*T), N//2)
+    return freq_space.tolist()
+
+def generate_features(draw_graphs, raw_data, axes, sampling_freq, hht_len, **kwargs):
+    # workaround for weird issue where hht_len is str
+    hht_len = int(hht_len)
+    # features is a 1D array, reshape so we have a matrix with one raw per axis
     raw_data = raw_data.reshape(int(len(raw_data) / len(axes)), len(axes))
 
     features = []
     graphs = []
 
+    graph_imf0 = {}
+    graph_imf1 = {}
+    graph_imf2 = {}
+
+
     # split out the data from all axes
     for ax in range(0, len(axes)):
         X = []
         for ix in range(0, raw_data.shape[0]):
-            X.append(float(raw_data[ix][ax]))
+            X.append(raw_data[ix][ax])
 
         # X now contains only the current axis
         fx = np.array(X)
 
-        # process the signal here
-        fx = fx * scale_axes
+        imf = []
+        res = []
 
-        # we need to return a 1D array again, so flatten here again
-        for f in fx:
-            features.append(f)
+        # get first three imfs and residuals
+        imf.append(get_next_imf(fx).tolist())
+        res.append(fx - imf[0])
+        imf.append(get_next_imf(res[0]).tolist())
+        res.append(res[0] - imf[1])
+        imf.append(get_next_imf(fx - imf[0] - imf[1]).tolist())
+        res.append(res[1] - imf[2])
+
+        # compute statistical features for imfs and residuals
+        for i in imf:
+            features.append(np.mean(i))
+            features.append(stats.skew(i))
+            features.append(stats.kurtosis(i))
+            # can't currently compute the normalized error, unclear what the base signal is
+            normalized_error = 0;
+            features.append(normalized_error)
+        
+        # compute statistical features for imfs and residuals
+        for i in res:
+            features.append(np.mean(i))
+            features.append(stats.skew(i))
+            features.append(stats.kurtosis(i))
+            # can't currently compute the normalized error, unclear what the base signal is
+            normalized_error = 0;
+            features.append(normalized_error)
+
+        # draw graphs conditional in-loop
+        if (draw_graphs):
+            graph_imf0[axes[ax]] = imf[0]
+            graph_imf1[axes[ax]] = imf[1]
+            graph_imf2[axes[ax]] = imf[2]
+
+    # draw graphs conditional after loop
+    if (draw_graphs):
+        imf0_vals = [i for v in graph_imf0.values() for i in v]
+        imf1_vals = [i for v in graph_imf1.values() for i in v]
+        imf2_vals = [i for v in graph_imf2.values() for i in v]
+
+        graphs.append({
+            'name': 'IMF1',
+            'X': graph_imf1,
+            'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
+            'suggestedYMin': min(imf0_vals),
+            'suggestedYMax': max(imf0_vals)
+        })
+        graphs.append({
+            'name': 'IMF2',
+            'X': graph_imf2,
+            'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
+            'suggestedYMin': min(imf1_vals),
+            'suggestedYMax': max(imf1_vals)
+        })
+        graphs.append({
+            'name': 'IMF3',
+            'X': graph_imf2,
+            'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
+            'suggestedYMin': min(imf2_vals),
+            'suggestedYMax': max(imf2_vals)
+        })
 
     return {
-        'features': features,
-        'graphs': graphs,
-        'output_config': {
-            # type can be 'flat', 'image' or 'spectrogram'
-            'type': 'flat',
-            'shape': {
-                # shape should be { width, height, channels } for image, { width, height } for spectrogram
-                'width': len(features)
+            'features': features,
+            'graphs': graphs
             }
-        }
-    }

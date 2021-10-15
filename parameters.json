@@ -1,10 +1,10 @@
 {
     "version": 1,
     "info": {
-        "title": "Custom Block",
-        "author": "Test User",
-        "description": "Custom block example",
-        "name": "Custom block",
+        "title": "Hilbert Transfrom",
+        "author": "David Schwarz",
+        "description": "Applies HHT to a signal",
+        "name": "HHT",
         "cppType": "custom_block",
         "preferConvolution": false,
         "visualization": "dimensionalityReduction",
@@ -21,6 +21,16 @@
                     "type": "float",
                     "help": "Multiplies axes by this number",
                     "param": "scale-axes"
+                }
+            ],
+            "group": "Filter",
+            "items": [
+                {
+                    "name": "HHT length",
+                    "value": 256,
+                    "type": "int",
+                    "help": "number of HHT points",
+                    "param": "hht_len"
                 }
             ]
         }
