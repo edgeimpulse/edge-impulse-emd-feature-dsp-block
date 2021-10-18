@@ -3,6 +3,14 @@ from scipy import signal
 import emd
 from scipy import stats
 
+# helper function to flatten lists
+def flatten(input):
+    new_list = []
+    for i in input:
+        for j in i:
+            new_list.append(j)
+    return new_list
+
 # retrieve the next imf of the input signal. Use this on the prior computed imf or base signal
 def get_next_imf(x, zoom=None, sd_thresh=0.1):
     proto_imf = x.copy()  # Take a copy of the input so we don't overwrite anything
@@ -48,13 +56,11 @@ def generate_features(draw_graphs, raw_data, axes, sampling_freq, hht_len, **kwa
     # features is a 1D array, reshape so we have a matrix with one raw per axis
     raw_data = raw_data.reshape(int(len(raw_data) / len(axes)), len(axes))
 
+    # features is a fixed size 48x1 dimension list
     features = []
     graphs = []
 
-    graph_imf0 = {}
-    graph_imf1 = {}
-    graph_imf2 = {}
-
+    graph_data = {'imf0' : {}, 'imf1' : {}, 'imf2' : {}, 'res0' : {}, 'res1' : {}, 'res2' : {}}
 
     # split out the data from all axes
     for ax in range(0, len(axes)):
@@ -69,65 +75,79 @@ def generate_features(draw_graphs, raw_data, axes, sampling_freq, hht_len, **kwa
         res = []
 
         # get first three imfs and residuals
-        imf.append(get_next_imf(fx).tolist())
+        imf.append(get_next_imf(fx))
         res.append(fx - imf[0])
-        imf.append(get_next_imf(res[0]).tolist())
+        imf.append(get_next_imf(res[0]))
         res.append(res[0] - imf[1])
-        imf.append(get_next_imf(fx - imf[0] - imf[1]).tolist())
+        imf.append(get_next_imf(fx - imf[0] - imf[1]))
         res.append(res[1] - imf[2])
 
         # compute statistical features for imfs and residuals
         for i in imf:
             features.append(np.mean(i))
+            features.append(np.std(i))
             features.append(stats.skew(i))
             features.append(stats.kurtosis(i))
-            # can't currently compute the normalized error, unclear what the base signal is
-            normalized_error = 0;
-            features.append(normalized_error)
         
         # compute statistical features for imfs and residuals
         for i in res:
             features.append(np.mean(i))
+            features.append(np.std(i))
             features.append(stats.skew(i))
             features.append(stats.kurtosis(i))
-            # can't currently compute the normalized error, unclear what the base signal is
-            normalized_error = 0;
-            features.append(normalized_error)
 
         # draw graphs conditional in-loop
         if (draw_graphs):
-            graph_imf0[axes[ax]] = imf[0]
-            graph_imf1[axes[ax]] = imf[1]
-            graph_imf2[axes[ax]] = imf[2]
+            graph_data['imf0'][axes[ax]] = imf[0].tolist()
+            graph_data['res0'][axes[ax]] = res[0].tolist()
+            graph_data['imf1'][axes[ax]] = imf[1].tolist()
+            graph_data['res1'][axes[ax]] = res[1].tolist()
+            graph_data['imf2'][axes[ax]] = imf[2].tolist()
+            graph_data['res2'][axes[ax]] = res[2].tolist()
 
-    # draw graphs conditional after loop
     if (draw_graphs):
-        imf0_vals = [i for v in graph_imf0.values() for i in v]
-        imf1_vals = [i for v in graph_imf1.values() for i in v]
-        imf2_vals = [i for v in graph_imf2.values() for i in v]
-
+        graphs.append({
+            'name': 'IMF0',
+            'X': graph_data['imf0'],
+            'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
+            'suggestedYMin': min(flatten(graph_data['imf0'].values())),
+            'suggestedYMax': max(flatten(graph_data['imf0'].values())),
+        })
+        graphs.append({
+            'name': 'RES0',
+            'X': graph_data['res0'],
+            'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
+            'suggestedYMin': min(flatten(graph_data['res0'].values())),
+            'suggestedYMax': max(flatten(graph_data['res0'].values()))
+        })
         graphs.append({
             'name': 'IMF1',
-            'X': graph_imf1,
+            'X': graph_data['imf1'],
             'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
-            'suggestedYMin': min(imf0_vals),
-            'suggestedYMax': max(imf0_vals)
+            'suggestedYMin': min(flatten(graph_data['imf1'].values())),
+            'suggestedYMax': max(flatten(graph_data['imf1'].values()))
+        })
+        graphs.append({
+            'name': 'RES1',
+            'X': graph_data['res1'],
+            'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
+            'suggestedYMin': min(flatten(graph_data['res1'].values())),
+            'suggestedYMax': max(flatten(graph_data['res1'].values()))
         })
         graphs.append({
             'name': 'IMF2',
-            'X': graph_imf2,
+            'X': graph_data['imf2'],
             'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
-            'suggestedYMin': min(imf1_vals),
-            'suggestedYMax': max(imf1_vals)
+            'suggestedYMin': min(flatten(graph_data['imf2'].values())),
+            'suggestedYMax': max(flatten(graph_data['imf2'].values()))
         })
         graphs.append({
-            'name': 'IMF3',
-            'X': graph_imf2,
+            'name': 'RES2',
+            'X': graph_data['res2'],
             'y': np.linspace(0.0, raw_data.shape[0] * (1 / sampling_freq) * 1000, raw_data.shape[0] + 1).tolist(),
-            'suggestedYMin': min(imf2_vals),
-            'suggestedYMax': max(imf2_vals)
+            'suggestedYMin': min(flatten(graph_data['res2'].values())),
+            'suggestedYMax': max(flatten(graph_data['res2'].values()))
         })
-
     return {
             'features': features,
             'graphs': graphs
