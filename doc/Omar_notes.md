@@ -9,27 +9,21 @@ There are three papers related to this project:
 
 * The first article describes the data set processing:
 
-```
 [Feature Extraction and Reduction Applied to Sensorless Drive Diagnosis.]() Bator, Martyna & Dicks, Alexander & Mönks, Uwe & Lohweg, Volker. (2012).
-```
 
 * The second article is a berif of the first article:
 
-```
+
 [Sensorless Drive Diagnosis Using Automated Feature Extraction, Significance Ranking and Reduction]() Bayer, M. Bator, U. Mönks, A. Dicks, O. Enge-Rosenblatt, and V. Lohweg. 2013.
-```
+
 
 * The third articles in evaluating several machine learning methods: 
 
-```
 [Evaluation of Machine Learning for Sensorless Detection and Classification of Faults in Electromechanical Drive Systems](https://www.researchgate.net/publication/344492789_Evaluation_of_Machine_Learning_for_Sensorless_Detection_and_Classification_of_Faults_in_Electromechanical_Drive_Systems) T. Gruner et al. 2020.
-```
 
 * Fourh article that is using the same dataset (not the same authors):
 
-```
 [Group Sparse Regularization for Deep Neural Networks](https://arxiv.org/abs/1607.00485) S. Scardapane, D.Comminiello, A. Hussain, A. Uncini. 2016 
-```
 
 ### The datasets
 
@@ -219,10 +213,10 @@ Useful links:
 * ANN hyper paramaeters are well mentioned and explained.
  
 
-Authors results:
+**Authors results**:
 
-|Project     | Method used | Dataset used | Accuracy (Training) | Acurracy (Testing) |
---------------------------------------------------------------------------------------
+|Project     | Method used | Dataset used | Accuracy (Training)| Acurracy (Testing)  |
+|------------|-------------|------------- |--------------------|-------------------- |
 | 2020  Paper | Knn     |    M(RFE25)     |   100              |  99.94              |
 | ML  Evaluation | SVM  |    M(RFE25)     |   100              |  99.66              |
 |             | XGBoost |       M         |   100              |  99.84              |
@@ -231,11 +225,11 @@ Authors results:
 |             |  ANN 20 |        ?        |   99.45            |  99.36              |
 
 
-Our results: 
+**Our results**: 
 
 
 |Project     | Method used | Dataset used | Accuracy (Training) | Acurracy (Testing) |
---------------------------------------------------------------------------------------
+|--------    |-------------|--------------|---------------------|--------------------|
 | D1         | 1D Conv NN  |    Raw + DSP = ?  |   97.9          |  87.00            |
 | D2(v1)     |   FFN       |    M (EI treatement)|  98.5         |  96.59            |
 | D2(v2)     |   SVM       |    M   EI          |   66.40        |   ?               |
