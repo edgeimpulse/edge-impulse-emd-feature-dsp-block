@@ -236,8 +236,9 @@ Our results:
 |Project     | Method used | Dataset used | Accuracy (Training) | Acurracy (Testing) |
 --------------------------------------------------------------------------------------
 | D1         | 1D Conv NN  |    Raw + DSP = ?  |   97.9          |  87.00            |
-| D2(v1)     |   FFN       |    M (EI treatement)|  98.5         |                   |
-| D2(v2)     |   SVM       |    M   EI          |   66.40        |                   |
+| D2(v1)     |   FFN       |    M (EI treatement)|  98.5         |  96.59            |
+| D2(v2)     |   SVM       |    M   EI          |   66.40        |   ?               |
+| D2(v3)     |   FFN       |    M   EI          |   98.5         |                   |
 --------------------------------------------------------------------------------------
 
 ### What do we need to optimize
