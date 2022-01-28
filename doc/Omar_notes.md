@@ -164,12 +164,9 @@ Therefore, a reduction of feature vector is required.
 
 #### The first test:
 
-D1: The first analysis related to this project is using the raw dataset and applying the same exact method to 
-extract features from the raw dataset using the DSP block that contains our implementation of the EMD
-
-The dataset have been treated locally and uploaded to the studio?? ( not sure to be detailed)
-
-MFE Processing block for audio is used in this project ? why 
+D1: The first analysis related to this project is using the raw dataset and uploading the same
+dataset directly to the studio, the MFE Processing block for audio is used in this project as a 
+DSP block in order to treat the dataset.
 
 The training method used is 1D Conv NN.
 
@@ -187,14 +184,21 @@ Useful links:
 
 * Project link in the studio:  https://studio.edgeimpulse.com/public/41083/latest
 
+
 The DSP block that we have implementated can be found here:
 ```
 * https://github.com/Dasch0/edge-impulse-emd-feature-dsp-block
 ```
+This DSP block tries to transform the raw dataset to look similar to UCI dataset.
+This block has been used only locally.
 
 #### The second test
 
 D2: The second analysis is done directly using the feature extracted dataset that is done by the authors and published on then UCI website.
+
+Each line of the dataset is treated as file and label deduced from the file name, no transformation block was required.
+
+It is possible to extract the dataset from the studio back to json
 
 The training method used is ANN Feed forward network.
 
@@ -202,10 +206,8 @@ ANN Hyper parameters:
 * Epochs = 200
 * layers (48, 96, 48, 24, 12)
 
-
 Useful links:
 * Project link in the studio: https://studio.edgeimpulse.com/studio/38818
-
 
 ### Authors results
 
@@ -227,7 +229,6 @@ Useful links:
 
 **Our results**: 
 
-
 |Project     | Method used | Dataset used | Accuracy (Training) | Acurracy (Testing) |
 |--------    |-------------|--------------|---------------------|--------------------|
 | D1         | 1D Conv NN  |    Raw + DSP = ?  |   97.9          |  87.00            |
@@ -238,9 +239,18 @@ Useful links:
 
 ### What do we need to optimize
 
-1) Accuracy that need to be at least 98 percent for testing datasets.
-2) Real time feautre extraction methods in order to get 48 features rapidly and then use the ML model for inference.
-3) Define the Window size that is necessary for the inference in real time
-4) Get a test bed or contact the university to see if we can use their test bed.
+**Short term objectives:**
+* Accuracy that need to be at least 98 percent for testing datasets.
+* Get the Jyputer notebook code and try it locally
+* Try with local tests with different ML frameworks.
+* Use the RFE method to produce the 25 column datasets.
+* Try Knn, SVM locally with the RFE25 dataset
+
+**Long term objectives:**
+* See if we need to write the DSP block in C++
+* We would like the run time to be fast, less care about memory
+* Objective to get the same 48 feature that we already have in the dataset
+* Window size requires optimization too.
+* Finally testbed 
 
 
