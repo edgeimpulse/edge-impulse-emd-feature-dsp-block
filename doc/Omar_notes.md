@@ -56,8 +56,9 @@ This dataset contains 11 classes, 58K feature vector each has 48 dimensions.
 * Data set normalization is important for Knn and SVM, no different in results is shown in tree based methods
 
 
-Dataset details
+**Dataset details**
 
+```
 Nr      statistic feature	phase	RES\IMF
 1	mean			1	IMF1
 2	mean			1	IMF2
@@ -127,6 +128,7 @@ ClassID		BF	AI	SM
 Class1 : Normal state (no failure in any module),
 Class2: shaft failure, and so on. 
 Class 4 and 5 are not the same, they differ in the angle of the axis inclination. The situation is similar for class8 and class11.
+```
 
 ### The current methods 
 
@@ -227,7 +229,6 @@ Authors results:
 |             | Random Foreset|  M        |   100              |  99.92              |
 |             |  ANN 3  |        ?        |   99.91            |  99.64              | 
 |             |  ANN 20 |        ?        |   99.45            |  99.36              |
---------------------------------------------------------------------------------------
 
 
 Our results: 
@@ -239,7 +240,7 @@ Our results:
 | D2(v1)     |   FFN       |    M (EI treatement)|  98.5         |  96.59            |
 | D2(v2)     |   SVM       |    M   EI          |   66.40        |   ?               |
 | D2(v3)     |   FFN       |    M   EI          |   98.5         |                   |
---------------------------------------------------------------------------------------
+
 
 ### What do we need to optimize
 
