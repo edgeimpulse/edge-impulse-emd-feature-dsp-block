@@ -1,14 +1,14 @@
 # syntax = docker/dockerfile:experimental
-FROM python:3.7.5-stretch
+FROM python:3.9-slim-buster
 
 WORKDIR /app
 
 # Python dependencies
-COPY requirements-blocks.txt ./
+COPY . ./
+RUN pip3 install --upgrade pip 
 RUN pip3 --no-cache-dir install -r requirements-blocks.txt
 
 COPY third_party /third_party
-COPY . ./
 
 EXPOSE 4446
 
