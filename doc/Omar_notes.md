@@ -1,6 +1,6 @@
 ## Omar notes' on Motor Current Signature Analysis (MCSA)
 
-These are my notes on the project, trying to analyze and breif what have been done
+These are my notes on the project, trying to analyze and brief what have been done
 in the past and what we need to do in the future.
 
 ### Current Status of the project:
@@ -9,19 +9,17 @@ There are three papers related to this project:
 
 * The first article describes the data set processing:
 
-[Feature Extraction and Reduction Applied to Sensorless Drive Diagnosis.]() Bator, Martyna & Dicks, Alexander & Mönks, Uwe & Lohweg, Volker. (2012).
+[Feature Extraction and Reduction Applied to Sensorless Drive Diagnosis.](https://www.researchgate.net/publication/264273485_Feature_Extraction_and_Reduction_Applied_to_Sensorless_Drive_Diagnosis) Bator, Martyna & Dicks, Alexander & Mönks, Uwe & Lohweg, Volker. (2012).
 
-* The second article is a berif of the first article:
+* The second article is a brief of the first article:
 
-
-[Sensorless Drive Diagnosis Using Automated Feature Extraction, Significance Ranking and Reduction]() Bayer, M. Bator, U. Mönks, A. Dicks, O. Enge-Rosenblatt, and V. Lohweg. 2013.
-
+[Sensorless Drive Diagnosis Using Automated Feature Extraction, Significance Ranking and Reduction](https://www.researchgate.net/publication/261282496_Sensorless_drive_diagnosis_using_automated_feature_extraction_significance_ranking_and_reduction) Bayer, M. Bator, U. Mönks, A. Dicks, O. Enge-Rosenblatt, and V. Lohweg. 2013.
 
 * The third articles in evaluating several machine learning methods: 
 
 [Evaluation of Machine Learning for Sensorless Detection and Classification of Faults in Electromechanical Drive Systems](https://www.researchgate.net/publication/344492789_Evaluation_of_Machine_Learning_for_Sensorless_Detection_and_Classification_of_Faults_in_Electromechanical_Drive_Systems) T. Gruner et al. 2020.
 
-* Fourh article that is using the same dataset (not the same authors):
+* Fourth article that is using the same dataset (not the same authors):
 
 [Group Sparse Regularization for Deep Neural Networks](https://arxiv.org/abs/1607.00485) S. Scardapane, D.Comminiello, A. Hussain, A. Uncini. 2016 
 
@@ -29,7 +27,7 @@ There are three papers related to this project:
 
 The project uses 2 datasets: 
 
-* The first dataset is the raw dataset from the German Autmatica
+* The first dataset is the raw dataset from the German Automatica
 
 ```
 https://zenodo.org/record/35577#.YfGYWIrLdhF
@@ -37,7 +35,7 @@ https://zenodo.org/record/35577#.YfGYWIrLdhF
 
 This dataset has been analyzed and the features has been extracted to created the second dataset.
 
-* The second dataset is the proccessed dataset uploaded by the authors to the dataset portal:
+* The second dataset is the processed dataset uploaded by the authors to the dataset portal:
 
 ```
 https://archive.ics.uci.edu/ml/datasets/dataset+for+sensorless+drive+diagnosis#
@@ -126,35 +124,35 @@ Class 4 and 5 are not the same, they differ in the angle of the axis inclination
 
 ### The current methods 
 
-In order to extract features from the raw datasets, the authors are usiung the EMD (Empirical Mode Decomposition) method
-This methods is usually applied on complex signals that have several frequencies. The EMD method alllow to extract these frequencies as a 
-set of functions know as Intrinsic mode functions. The higher mode number is the smaller frequency it contains.
+In order to extract features from the raw datasets, the authors are using the EMD (Empirical Mode Decomposition) method
+This methods is usually applied on complex signals that have several frequencies. The EMD method allows to extract these frequencies as a 
+set of functions know as Intrinsic Mode Functions (IMF). The higher mode number is the smaller frequency it contains.
 
-Therefore, the sum of all the mode function and the residual provides us back with the original signal
+Therefore, the sum of all the mode functions and the residual provides us back with the original signal.
 
 ```
 f(t) = Sum(imf(i)) + res
 ```
 
 **EMD Steps**:
-1) Find the local extrema of the signal (Max and Min)
+1) Find the local extrema of the signal (Max and Min).
 2) Fit an envelope on the all maxima and minima point that contains all the signal data.
-3) Create a mean envelope from the min and max envelope E(mean)t = (E(up)t + E(low)t) \ 2
-4) Determin residual by subtracting the origianl signal from the mean envelope.
+3) Create a mean envelope from the min and max envelope E(mean)t = (E(up)t + E(low)t) \ 2.
+4) Determine residual by subtracting the original signal from the mean envelope.
 res = f(x) - E(mean)t
-5) Check the stopping criteria
-6) Iterate untill 5 stop the proces
+5) Check the stopping criteria.
+6) Iterate until 5 stop the process.
 
-Once the IMF is extracted, the authors parition the IMFS into a set of subsequent signals.
-Then for each of subsequent, a set of statistical fueatures are calculated.
+Once the IMF is extracted, the authors partition the IMFS into a set of subsequent signals.
+Then for each of subsequent, a set of statistical features are calculated.
 The set of features that are calculated are the following:
 1) Mean
 2) Standard deviation
-3) Skeness
+3) Skewness
 4) Excess
 5) Normalized error indicator.
 
-The statistical feautre are aggolmerated for each subsequence to create a long feature vector related to each signal.
+The statistical feature are agglomerated for each subsequence to create a long feature vector related to each signal.
 Therefore, a reduction of feature vector is required.
 
 **Linear Discriminant Analysis (LDA)**
@@ -185,7 +183,7 @@ Useful links:
 * Project link in the studio:  https://studio.edgeimpulse.com/public/41083/latest
 
 
-The DSP block that we have implementated can be found here:
+The DSP block that we have implemented can be found here:
 ```
 * https://github.com/Dasch0/edge-impulse-emd-feature-dsp-block
 ```
@@ -198,59 +196,72 @@ D2: The second analysis is done directly using the feature extracted dataset tha
 
 Each line of the dataset is treated as file and label deduced from the file name, no transformation block was required.
 
-It is possible to extract the dataset from the studio back to json
+It is possible to extract the dataset from the studio back to Json
 
 The training method used is ANN Feed forward network.
+
+
+**Version 1 Hyper parameters**
 
 ANN Hyper parameters:
 * Epochs = 200
 * layers (48, 96, 48, 24, 12)
+
+**Version 2 Hyper parameters**
+* SVM traditional ML, not supported yet.
+
+**Version 3 Hyper parameters**
+
+ANN Hyper parameters:
+* Epochs = Unlimited, controlled by early stop at min loss (callback)
+* Use tanh activation function, with softmax for last layer
+* layers (48, 90, 120, 90, 12)
 
 Useful links:
 * Project link in the studio: https://studio.edgeimpulse.com/studio/38818
 
 ### Authors results
 
-* All classification results acheive accuracy of > 98 percent
-* ANN hyper paramaeters are well mentioned and explained.
+* All classification results achieve accuracy of > 98 percent
+* ANN hyper parameters are well mentioned and explained.
  
 
 **Authors results**:
 
-|Project     | Method used | Dataset used | Accuracy (Training)| Acurracy (Testing)  |
+|Project     | Method used | Dataset used | Accuracy (Training)| Accuracy (Testing)  |
 |------------|-------------|------------- |--------------------|-------------------- |
 | 2020  Paper | Knn     |    M(RFE25)     |   100              |  99.94              |
 | ML  Evaluation | SVM  |    M(RFE25)     |   100              |  99.66              |
 |             | XGBoost |       M         |   100              |  99.84              |
-|             | Random Foreset|  M        |   100              |  99.92              |
+|             | Random Forest |  M        |   100              |  99.92              |
 |             |  ANN 3  |        ?        |   99.91            |  99.64              | 
 |             |  ANN 20 |        ?        |   99.45            |  99.36              |
 
 
 **Our results**: 
 
-|Project     | Method used | Dataset used | Accuracy (Training) | Acurracy (Testing) |
+|Project     | Method used | Dataset used | Accuracy (Training) | Accuracy (Testing) |
 |--------    |-------------|--------------|---------------------|--------------------|
 | D1         | 1D Conv NN  |    Raw + DSP = ?  |   97.9          |  87.00            |
-| D2(v1)     |   FFN       |    M (EI treatement)|  98.5         |  96.59            |
+| D2(v1)     |   FFN       |    M (EI treatment)|  98.5          |  96.59            |
 | D2(v2)     |   SVM       |    M   EI          |   66.40        |   ?               |
-| D2(v3)     |   FFN       |    M   EI          |   98.5         |                   |
+| D2(v3)     |   FFN       |    M   EI          |   98.7         |  96.69            |
 
 
 ### What do we need to optimize
 
 **Short term objectives:**
-* Accuracy that need to be at least 98 percent for testing datasets.
-* Get the Jyputer notebook code and try it locally
-* Try with local tests with different ML frameworks.
-* Use the RFE method to produce the 25 column datasets.
-* Try Knn, SVM locally with the RFE25 dataset
+* [ ] Accuracy that need to be at least 98 percent for testing datasets.
+* [ ] Start working on the DSP block in C++ for fast computation
+* [ ] Get the Jupyter notebook code and try it locally
+* [ ] Try with local tests with different ML frameworks.
+* [ ] Use the RFE method to produce the 25 column datasets.
+* [ ] Try Knn, SVM locally with the RFE25 dataset
 
 **Long term objectives:**
-* See if we need to write the DSP block in C++
-* We would like the run time to be fast, less care about memory
-* Objective to get the same 48 feature that we already have in the dataset
-* Window size requires optimization too.
-* Finally testbed 
+* [ ] We would like the run time to be fast, less care about memory
+* [ ] Objective to get the same 48 feature that we already have in the dataset
+* [ ] Window size requires optimization too.
+* [ ] Finally test the model on the Test bed 
 
 
