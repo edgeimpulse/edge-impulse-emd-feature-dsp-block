@@ -34,25 +34,49 @@ const size_t N = 1500; // Window size is equal to 15 ms
 void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
 {
   arma::mat file;
-  for (size_t i=1; i < 9; ++i)
+  // If the user enter the class_num 0 then parse all the dataset entirely with
+  // all the classes
+  if (class_num == 0)
   {
-    bool state =
-    file.load("../../datasets/raw_datasets/Sensorless_Drive_Diagnosis_Data_Set/class"
-    + std::to_string(class_num) + "/class" + std::to_string(class_num) + "_Parameterset" 
-    + std::to_string(i) + ".txt");
-    std::cout << "Print the state of the loading:.. "<< state << std::endl;
-    if (state == false)
+    for (size_t  j=1; j < 11; ++j)
     {
-      //see later what to do
+      for (size_t i=1; i < 9; ++i)
+      {
+        bool state =
+        file.load("../../datasets/raw_datasets/Sensorless_Drive_Diagnosis_Data_Set/class"
+        + std::to_string(j) + "/class" + std::to_string(j) + "_Parameterset" 
+        + std::to_string(i) + ".txt");
+        std::cout << "Loading State: "<< state << " Loading class number: " << j << std::endl;
+        if (state == false)
+        {
+          //see later what to do
+        }
+        datasets.push_back(file);
+      }
     }
-    datasets.push_back(file);
+  } 
+  else // parse class by number the dataset will be related to a specific class
+  {
+    for (size_t i=1; i < 9; ++i)
+    {
+      bool state =
+      file.load("../../datasets/raw_datasets/Sensorless_Drive_Diagnosis_Data_Set/class"
+      + std::to_string(class_num) + "/class" + std::to_string(class_num) + "_Parameterset" 
+      + std::to_string(i) + ".txt");
+      std::cout << "Loading State: "<< state << "Loading class: "<< class_num << " file num: " << std::endl;
+      if (state == false)
+      {
+        //see later what to do
+      }
+      datasets.push_back(file);
+    }
   }
 }
 
 int main(void)
 {
   std::vector<arma::mat> dataset_class1;
-  load_all_datasets(dataset_class1, 1);
+  load_all_datasets(dataset_class1, 0);
 
   
   // libeemd_error_code err;
