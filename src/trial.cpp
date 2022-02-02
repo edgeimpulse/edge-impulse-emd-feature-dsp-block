@@ -73,45 +73,60 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
   }
 }
 
-int main(void)
+
+// This function constitutes the main functionality of
+// computing the IMF of the signals.
+// The signal matrix or vector, should be cut to 1500 and prepared for 
+// the dsp. This block does not handle any kind of data preparation. 
+void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::mat& output_statistics)
 {
-  std::vector<arma::mat> dataset_class1;
-  load_all_datasets(dataset_class1, 0);
-
-  
-  // libeemd_error_code err;
+  libeemd_error_code err_signal_1, err_signal_2;
  
-  // // We have only two phases as input signals from the motors.
-  // double* phase_1_input_vector = (double*) malloc(N*sizeof(double));
-  // double* phase_2_input_vector = (double*) malloc(N*sizeof(double));
-  // memset(phase_1_input_vector, 0x00, N*sizeof(double));
-  // memset(phase_2_input_vector, 0x00, N*sizeof(double));
+  // We have only two phases as input signals from the motors.
+  double* phase_1_input_vector = (double*) malloc(N*sizeof(double));
+  double* phase_2_input_vector = (double*) malloc(N*sizeof(double));
+  memset(phase_1_input_vector, 0x00, N*sizeof(double));
+  memset(phase_2_input_vector, 0x00, N*sizeof(double));
 
-  // size_t M = emd_num_imfs(N);
-  // double* output_phase_1 = (double*)malloc(M*N*sizeof(double));
-  // double* output_phase_2 = (double*)malloc(M*N*sizeof(double));
+  size_t M = emd_num_imfs(N);
+  double* output_phase_1 = (double*)malloc(M*N*sizeof(double));
+  double* output_phase_2 = (double*)malloc(M*N*sizeof(double));
 
-  // arma::mat phase1;
+  // Assign the signal to the C-style array, and do the computation on 
+  // C style. The reason for this is that the EMD library is written in C99
+  // I had to modify some part of the library too to make compile with g++
+  // In essence, the IMF code is the same.
+  // // I know this loop is stupid and can be avoided, I do remember that we can point
+  // out a memory location and get a pointer from their directly from arma to anything 
+  // else. I need to check how to do it.
+  for (size_t i=0; i < N; ++i)
+  {
+    phase_1_input_vector[i] = signal_1(i);
+    phase_2_input_vector[i] = signal_2(i);
+  }
 
+  // Run CEEMDAN
+  err_signal_1 = ceemdan(phase_1_input_vector, N, output_phase_1, M, ensemble_size, noise_strength, S_number, num_siftings, rng_seed);
+  if (err_signal_1 != EMD_SUCCESS)
+  {
+    emd_report_if_error(err_signal_1);
+    exit(1);
+  }
 
-  // // Decut the signals into 15 ms, which means 1500 lines of code.
-  // for (size_t i=0; i < N; ++i)
-  // {
-  //   input_vector[i]= phase1(i, 1);
-  // }
+  err_signal_2 = ceemdan(phase_2_input_vector, N, output_phase_2, M, ensemble_size, noise_strength, S_number, num_siftings, rng_seed);
+  if (err_signal_2 != EMD_SUCCESS)
+  {
+    emd_report_if_error(err_signal_2);
+    exit(1);
+  }
+  // Write output to file
+  // First write the signals it self as the first line of the file
+  // Second write the IMFs from the output variable to the same file
+  // Finally the file contains the original signals and the IMFS and the res.
 
-  // // Run CEEMDAN
-  // err = ceemdan(input_vector, N, outp, M, ensemble_size, noise_strength, S_number, num_siftings, rng_seed);
-  // if (err != EMD_SUCCESS)
-  // {
-  //   emd_report_if_error(err);
-  //   exit(1);
-  // }
+  // The output to a file is not necessary for now, this can be removed later.
+  // Keep it now, it is good for debugging.
 
-  // // Write output to file
-  // // First write the signals it self as the first line of the file
-  // // Second write the IMFs from the output variable to the same file
-  // // Finally the file contains the original signals and the IMFS and the res.
   // FILE* fp = fopen(outfile, "w");
   // for (size_t j=0; j<N; j++)
   // {
@@ -126,9 +141,22 @@ int main(void)
   //   }
   //   fprintf(fp, "\n");
   // }
-  // printf("Done!\n");
-  // // Cleanup
+  printf("Done!\n");
+  // Clean the memory before losing all the heap.
   // fclose(fp);
-  // free(input_vector); input_vector = NULL;
-  // free(outp); outp = NULL;
+  free(phase_1_input_vector); phase_1_input_vector = NULL;
+  free(phase_2_input_vector); phase_2_input_vector = NULL;
+  free(output_phase_1); output_phase_1 = NULL;
+  free(output_phase_2); output_phase_2 = NULL;
+}
+
+int main(void)
+{
+  std::vector<arma::mat> dataset;
+  load_all_datasets(dataset, 0);
+
+  
+
+  
+
 }
