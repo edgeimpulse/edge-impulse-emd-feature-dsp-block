@@ -150,6 +150,14 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::mat& output_stati
   free(output_phase_2); output_phase_2 = NULL;
 }
 
+
+// This function should prepare the signals and cut it into 15ms subsequent signals.
+void prepare_signals()
+{
+
+  
+}
+
 int main(void)
 {
   std::vector<arma::mat> dataset;
