@@ -1,11 +1,8 @@
-# This is a simple Makefile used to build the example source code.
-# This example might requires some modifications in order to work correctly on
-# your system.
 # If you're not using the Armadillo wrapper, replace `armadillo` with linker commands
 # for the BLAS and LAPACK libraries that you are using.
 
 TARGET := trial
-SRC := trial.cpp eemd.c
+SRC := trial.cpp eemd.cpp
 LIBS_NAME := armadillo
 
 CXX := g++
@@ -15,7 +12,7 @@ CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
 CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
 GSL_FLAGS := $(shell pkg-config --libs --cflags gsl) -DHAVE_INLINE
 LDFLAGS  += -fopenmp
-LDFLAGS += -L. # /path/to/mlpack/build/lib/  # if installed locally.
+LDFLAGS += -L. # if installed locally.
 # Add header directories for any includes that aren't on the
 # default compiler search path.
 INCLFLAGS := -I .
