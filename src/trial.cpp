@@ -2,15 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <gsl/gsl_math.h>
-
 #include <armadillo>
 
-const double pi = M_PI;
-
-extern "C" {
 #include "eemd.h"
-}
 
+const double pi = M_PI;
 const size_t ensemble_size = 500;
 const unsigned int S_number = 4;
 const unsigned int num_siftings = 50;
@@ -33,9 +29,13 @@ int main(void)
   arma::mat phase1;
   phase1.load("../../datasets/raw_datasets/Sensorless_Drive_Diagnosis_Data_Set/class1/class1_Parameterset1.txt");
 
+  std::cout << phase1(1,1) << std::endl;
+  std::cout << phase1(1,1) << std::endl;
+  std::cout << phase1(1,1) << std::endl;
+
   for (size_t i=0; i < N; ++i)
   {
-    input_vector[i]= phase1(1, i);
+    input_vector[i]= phase1(i, 1);
   }
 
   // Run CEEMDAN

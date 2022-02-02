@@ -32,8 +32,13 @@ The project uses 2 datasets:
 ```
 https://zenodo.org/record/35577#.YfGYWIrLdhF
 ```
-
 This dataset has been analyzed and the features has been extracted to created the second dataset.
+
+**Zenodo dataset details**
+* First column is the time stamps
+* Second column is the first phase
+* Third column is the second phase
+* Each file contains 10 secs of dataset.
 
 * The second dataset is the processed dataset uploaded by the authors to the dataset portal:
 
@@ -48,7 +53,7 @@ This dataset contains 11 classes, 58K feature vector each has 48 dimensions.
 * Data set normalization is important for Knn and SVM, no different in results is shown in tree based methods
 
 
-**Dataset details**
+**UCI Dataset details**
 
 ```
 Nr      statistic feature	phase	RES\IMF
@@ -121,6 +126,18 @@ Class1 : Normal state (no failure in any module),
 Class2: shaft failure, and so on. 
 Class 4 and 5 are not the same, they differ in the angle of the axis inclination. The situation is similar for class8 and class11.
 ```
+
+### Window Size estimation
+* Each class from the raw dataset has 8 files.
+* Each file contains dataset of 10 seconds.
+* In total each class has 80 seconds datasets.
+* In the UCI datset, each class has 5139 lines
+* Which means that: each line represent the statistical features of 15 ms signals
+* This deduced by 80/5130 = 0.015 sec -> 15 ms.
+* The first data set is captured at 100 KHZ.
+* Which means that 15 ms is equal to 1500 lines of the first dataset.
+* As a result: each line of the UCI dataset is computed from 1500 lines of the raw dataset.
+
 
 ### The current methods 
 

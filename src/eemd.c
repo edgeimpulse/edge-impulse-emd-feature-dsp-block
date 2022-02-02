@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with libeemd.  If not, see <http://www.gnu.org/licenses/>.
  */
-extern "C"
-{
 
 #include "eemd.h"
 
@@ -901,4 +899,4 @@ void emd_report_to_file_if_error(FILE* file, libeemd_error_code err) {
 void emd_report_if_error(libeemd_error_code err) {
 	emd_report_to_file_if_error(stderr, err);
 }
-}
+
