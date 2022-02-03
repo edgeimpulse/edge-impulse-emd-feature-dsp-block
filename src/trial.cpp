@@ -73,12 +73,11 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
   }
 }
 
-
 // This function constitutes the main functionality of
 // computing the IMF of the signals.
 // The signal matrix or vector, should be cut to 1500 and prepared for 
 // the dsp. This block does not handle any kind of data preparation. 
-void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::mat& output_statistics)
+void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_statistics_signal_1, arma::vec& output_statistics_signal_2)
 {
   libeemd_error_code err_signal_1, err_signal_2;
  
@@ -88,9 +87,9 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::mat& output_stati
   memset(phase_1_input_vector, 0x00, N*sizeof(double));
   memset(phase_2_input_vector, 0x00, N*sizeof(double));
 
-  size_t M = emd_num_imfs(N);
-  double* output_phase_1 = (double*)malloc(M*N*sizeof(double));
-  double* output_phase_2 = (double*)malloc(M*N*sizeof(double));
+  size_t num_imfs = emd_num_imfs(N);
+  double* output_phase_1 = (double*)malloc(num_imfs*N*sizeof(double));
+  double* output_phase_2 = (double*)malloc(num_imfs*N*sizeof(double));
 
   // Assign the signal to the C-style array, and do the computation on 
   // C style. The reason for this is that the EMD library is written in C99
@@ -99,26 +98,46 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::mat& output_stati
   // // I know this loop is stupid and can be avoided, I do remember that we can point
   // out a memory location and get a pointer from their directly from arma to anything 
   // else. I need to check how to do it.
-  for (size_t i=0; i < N; ++i)
+  for (size_t i = 0; i < N; ++i)
   {
     phase_1_input_vector[i] = signal_1(i);
     phase_2_input_vector[i] = signal_2(i);
   }
 
   // Run CEEMDAN
-  err_signal_1 = ceemdan(phase_1_input_vector, N, output_phase_1, M, ensemble_size, noise_strength, S_number, num_siftings, rng_seed);
+  err_signal_1 = ceemdan(phase_1_input_vector, N, output_phase_1, num_imfs, ensemble_size, noise_strength, S_number, num_siftings, rng_seed);
   if (err_signal_1 != EMD_SUCCESS)
   {
     emd_report_if_error(err_signal_1);
     exit(1);
   }
 
-  err_signal_2 = ceemdan(phase_2_input_vector, N, output_phase_2, M, ensemble_size, noise_strength, S_number, num_siftings, rng_seed);
+  err_signal_2 = ceemdan(phase_2_input_vector, N, output_phase_2, num_imfs, ensemble_size, noise_strength, S_number, num_siftings, rng_seed);
   if (err_signal_2 != EMD_SUCCESS)
   {
     emd_report_if_error(err_signal_2);
     exit(1);
   }
+
+  arma::mat output_arma_signal_1(num_imfs, N, arma::fill::none);
+  arma::mat output_arma_signal_2(num_imfs, N, arma::fill::none);
+
+  for (size_t i = 0; i < num_imfs; ++i)
+  {
+    for (size_t j = 0; j < N; ++j)
+    {
+      output_arma_signal_1.at(i, j) = output_phase_1[i * N + j];
+      output_arma_signal_2.at(i, j) = output_phase_2[i * N + j];    
+    } 
+  }
+
+  output_arma_signal_1.set_size(num_imfs);
+  output_arma_signal_1.set_size(num_imfs);
+
+  output_statistics_signal_1 = arma::mean(output_arma_signal_1, 1); // Check the data order
+  output_statistics_signal_2 = arma::mean(output_arma_signal_2, 1); // Check the data order
+
+ 
   // Write output to file
   // First write the signals it self as the first line of the file
   // Second write the IMFs from the output variable to the same file
@@ -152,9 +171,14 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::mat& output_stati
 
 
 // This function should prepare the signals and cut it into 15ms subsequent signals.
-void prepare_signals()
+void prepare_signals(arma::mat& dataset, arma::vec& signal_1, arma::vec& signal_2)
 {
 
+  signal_1.set_size(1500);
+  signal_2.set_size(1500);
+
+  
+  
   
 }
 
