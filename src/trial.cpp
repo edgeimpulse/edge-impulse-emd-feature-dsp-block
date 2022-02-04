@@ -77,7 +77,7 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
 // computing the IMF of the signals.
 // The signal matrix or vector, should be cut to 1500 and prepared for 
 // the dsp. This block does not handle any kind of data preparation. 
-void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_statistics_signal_1, arma::vec& output_statistics_signal_2)
+void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_mean_signal_1, arma::vec& output_mean_signal_2, arma::vec& output_stddev_signal_1, arma::vec& output_stddev_signal_2)
 {
   libeemd_error_code err_signal_1, err_signal_2;
  
@@ -131,12 +131,17 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
     } 
   }
 
-  output_arma_signal_1.set_size(num_imfs);
-  output_arma_signal_1.set_size(num_imfs);
 
-  output_statistics_signal_1 = arma::mean(output_arma_signal_1, 1); // Check the data order
-  output_statistics_signal_2 = arma::mean(output_arma_signal_2, 1); // Check the data order
+  // Debugging
+  // output_arma_signal_1.save("signal_1", arma::csv_ascii);
+  // output_arma_signal_2.save("signal_2", arma::csv_ascii);
+  
 
+  output_mean_signal_1 = arma::mean(output_arma_signal_1, 1); // Check the data order
+  output_mean_signal_2 = arma::mean(output_arma_signal_2, 1); // Check the data order
+
+  output_stddev_signal_1 = arma::stddev(output_arma_signal_1, 0, 1); // Check the data order
+  output_stddev_signal_2 = arma::stddev(output_arma_signal_2, 0, 1); // Check the data order
  
   // Write output to file
   // First write the signals it self as the first line of the file
@@ -149,19 +154,19 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
   // FILE* fp = fopen(outfile, "w");
   // for (size_t j=0; j<N; j++)
   // {
-  //   fprintf(fp, "%f ", input_vector[j]);
+  //   //fprintf(fp, "%f ", input_vector[j]);
   // }
   // fprintf(fp, "\n");
-  // for (size_t i=0; i<M; i++)
+  // for (size_t i=0; i<num_imfs; i++)
   // {
   //   for (size_t j=0; j<N; j++)
   //   {
-  //     fprintf(fp, "%f ", outp[i*N+j]);
+  //     fprintf(fp, "%f ", output_phase_1[i*N+j]);
   //   }
   //   fprintf(fp, "\n");
   // }
-  printf("Done!\n");
-  // Clean the memory before losing all the heap.
+  // printf("Done!\n");
+  // // Clean the memory before losing all the heap.
   // fclose(fp);
   free(phase_1_input_vector); phase_1_input_vector = NULL;
   free(phase_2_input_vector); phase_2_input_vector = NULL;
@@ -197,7 +202,20 @@ int main(void)
 //  {
     prepare_signals(dataset.at(0), signal_1, signal_2, 10);
 //  }
-    signal_1.print("1");
-    signal_2.print("2");
+
+    // Just for debugging.
+    // signal_1.print("1");
+    // signal_2.print("2");
+
+
+    // Testing the DSP block
+    arma::vec output_mean_signal_1, output_mean_signal_2, output_stddev_signal_1, output_stddev_signal_2;
+    dsp_block(signal_1, signal_2, output_mean_signal_1, output_mean_signal_2, output_stddev_signal_1, output_stddev_signal_2);
+
+    output_mean_signal_1.print("1 stats: mean");
+    output_mean_signal_2.print("2 stats: mean");
+    output_stddev_signal_1.print("1 stats: stddev");
+    output_stddev_signal_2.print("2 stats: stddev");
+
 
 }
