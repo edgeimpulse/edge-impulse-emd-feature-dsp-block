@@ -63,7 +63,7 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
       file.load("../../datasets/raw_datasets/Sensorless_Drive_Diagnosis_Data_Set/class"
       + std::to_string(class_num) + "/class" + std::to_string(class_num) + "_Parameterset" 
       + std::to_string(i) + ".txt");
-      std::cout << "Loading State: "<< state << "Loading class: "<< class_num << " file num: " << std::endl;
+      std::cout << "Loading State: "<< state << " Loading class: "<< class_num << " file num: " << i << std::endl;
       if (state == false)
       {
         //see later what to do
@@ -171,24 +171,33 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
 
 
 // This function should prepare the signals and cut it into 15ms subsequent signals.
-void prepare_signals(arma::mat& dataset, arma::vec& signal_1, arma::vec& signal_2)
+void prepare_signals(arma::mat& dataset, arma::vec& signal_1, arma::vec& signal_2, int num_of_subsignals)
 {
-
-  signal_1.set_size(1500);
-  signal_2.set_size(1500);
-
-  
-  
-  
+  for(size_t i = 0; i < 1500; ++i)
+  {
+    signal_1.at(i) = dataset.at((num_of_subsignals * 1500) + i, 1);
+    signal_2.at(i) = dataset.at((num_of_subsignals * 1500) + i, 2);
+  }
 }
 
 int main(void)
 {
   std::vector<arma::mat> dataset;
-  load_all_datasets(dataset, 0);
+  load_all_datasets(dataset, 1);
+  double size = dataset.at(0).n_rows;
+  std::cout << "size of the first dataset " << size << std::endl;
+  size_t num_of_subsignals = size / 1500;
+  std::cout << "num_of_subsignals " << num_of_subsignals << std::endl;
 
-  
+  arma::vec signal_1(1500, arma::fill::none);
+  arma::vec signal_2(1500, arma::fill::none);
 
-  
+  // If we are going to iterate we need to call everything inside this loop
+//  for (size_t i = 0; i < num_of_subsignals; ++i)
+//  {
+    prepare_signals(dataset.at(0), signal_1, signal_2, 10);
+//  }
+    signal_1.print("1");
+    signal_2.print("2");
 
 }
