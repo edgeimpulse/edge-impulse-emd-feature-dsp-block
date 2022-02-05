@@ -195,30 +195,33 @@ void create_feature_matrix_per_class(std::vector<arma::mat>& dataset, arma::mat&
   arma::vec signal_2(1500, arma::fill::none);
 
   // If we are going to iterate we need to call everything inside this loop
-  arma::vec features_cols; // num_of_subsignals
-  for (size_t i = 0; i < 10; ++i)
+  arma::vec features_cols;
+  for (size_t j = 0; j < 8; ++j)
   {
-    prepare_signals(dataset.at(0), signal_1, signal_2, i);
- 
-    // Just for debugging.
-    // signal_1.print("1");
-    // signal_2.print("2");
+    for (size_t i = 0; i < num_of_subsignals; ++i)
+    {
+      prepare_signals(dataset.at(j), signal_1, signal_2, i);
+   
+      // Just for debugging.
+      // signal_1.print("1");
+      // signal_2.print("2");
 
-    // Testing the DSP block
-    arma::vec output_statistics_signal_1, output_statistics_signal_2;
-    dsp_block(signal_1, signal_2, output_statistics_signal_1, output_statistics_signal_2);
+      // Testing the DSP block
+      arma::vec output_statistics_signal_1, output_statistics_signal_2;
+      dsp_block(signal_1, signal_2, output_statistics_signal_1, output_statistics_signal_2);
 
-    // output_statistics_signal_1.print("1 stats: ");
-    // output_statistics_signal_2.print("2 stats: ");
-    features_cols = arma::join_cols(output_statistics_signal_1, output_statistics_signal_2);
-    features_matrix.insert_cols(features_matrix.n_cols, features_cols);
+      // output_statistics_signal_1.print("1 stats: ");
+      // output_statistics_signal_2.print("2 stats: ");
+      features_cols = arma::join_cols(output_statistics_signal_1, output_statistics_signal_2);
+      features_matrix.insert_cols(features_matrix.n_cols, features_cols);
+    }
   }
   // Put one for now just to test
   arma::rowvec class_id(10 /* this should be num_of_subsignals */, arma::fill::ones);
   class_id.print("Class ID: ");
   features_matrix.insert_rows(features_matrix.n_rows, class_id);
-  features_matrix.print("features: ");
-  // features_matrix = features_matrix.t();
+  // features_matrix.print("features: "); // Keep for debugging
+  features_matrix = features_matrix.t();
 }
 
 void create_feature_matrix(std::vector<arma::mat>& dataset, arma::mat& feature_matrix)
