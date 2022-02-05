@@ -77,7 +77,7 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
 // computing the IMF of the signals.
 // The signal matrix or vector, should be cut to 1500 and prepared for 
 // the dsp. This block does not handle any kind of data preparation. 
-void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_mean_signal_1, arma::vec& output_mean_signal_2, arma::vec& output_stddev_signal_1, arma::vec& output_stddev_signal_2)
+void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_statistics_signal_1, arma::vec& output_statistics_signal_2)
 {
   libeemd_error_code err_signal_1, err_signal_2;
  
@@ -131,17 +131,17 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_mean_
     } 
   }
 
-
   // Debugging
   // output_arma_signal_1.save("signal_1", arma::csv_ascii);
   // output_arma_signal_2.save("signal_2", arma::csv_ascii);
-  
 
-  output_mean_signal_1 = arma::mean(output_arma_signal_1, 1); // Check the data order
-  output_mean_signal_2 = arma::mean(output_arma_signal_2, 1); // Check the data order
+  arma::vec output_mean_signal_1 = arma::mean(output_arma_signal_1, 1); // Check the data order
+  arma::vec output_mean_signal_2 = arma::mean(output_arma_signal_2, 1); // Check the data order
+  arma::vec output_stddev_signal_1 = arma::stddev(output_arma_signal_1, 0, 1); // Check the data order
+  arma::vec output_stddev_signal_2 = arma::stddev(output_arma_signal_2, 0, 1); // Check the data order
 
-  output_stddev_signal_1 = arma::stddev(output_arma_signal_1, 0, 1); // Check the data order
-  output_stddev_signal_2 = arma::stddev(output_arma_signal_2, 0, 1); // Check the data order
+  output_statistics_signal_1 = arma::join_cols(output_mean_signal_1, output_stddev_signal_1);
+  output_statistics_signal_2 = arma::join_cols(output_mean_signal_2, output_stddev_signal_2);
  
   // Write output to file
   // First write the signals it self as the first line of the file
@@ -174,21 +174,18 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_mean_
   free(output_phase_2); output_phase_2 = NULL;
 }
 
-
 // This function should prepare the signals and cut it into 15ms subsequent signals.
-void prepare_signals(arma::mat& dataset, arma::vec& signal_1, arma::vec& signal_2, int num_of_subsignals)
+void prepare_signals(arma::mat& dataset, arma::vec& signal_1, arma::vec& signal_2, int which_subsignals)
 {
   for(size_t i = 0; i < 1500; ++i)
   {
-    signal_1.at(i) = dataset.at((num_of_subsignals * 1500) + i, 1);
-    signal_2.at(i) = dataset.at((num_of_subsignals * 1500) + i, 2);
+    signal_1.at(i) = dataset.at((which_subsignals * 1500) + i, 1);
+    signal_2.at(i) = dataset.at((which_subsignals * 1500) + i, 2);
   }
 }
 
-int main(void)
+void create_feature_matrix_per_class(std::vector<arma::mat>& dataset, arma::mat& features_matrix)
 {
-  std::vector<arma::mat> dataset;
-  load_all_datasets(dataset, 1);
   double size = dataset.at(0).n_rows;
   std::cout << "size of the first dataset " << size << std::endl;
   size_t num_of_subsignals = size / 1500;
@@ -198,24 +195,47 @@ int main(void)
   arma::vec signal_2(1500, arma::fill::none);
 
   // If we are going to iterate we need to call everything inside this loop
-//  for (size_t i = 0; i < num_of_subsignals; ++i)
-//  {
-    prepare_signals(dataset.at(0), signal_1, signal_2, 10);
-//  }
-
+  arma::vec features_cols; // num_of_subsignals
+  for (size_t i = 0; i < 10; ++i)
+  {
+    prepare_signals(dataset.at(0), signal_1, signal_2, i);
+ 
     // Just for debugging.
     // signal_1.print("1");
     // signal_2.print("2");
 
-
     // Testing the DSP block
-    arma::vec output_mean_signal_1, output_mean_signal_2, output_stddev_signal_1, output_stddev_signal_2;
-    dsp_block(signal_1, signal_2, output_mean_signal_1, output_mean_signal_2, output_stddev_signal_1, output_stddev_signal_2);
+    arma::vec output_statistics_signal_1, output_statistics_signal_2;
+    dsp_block(signal_1, signal_2, output_statistics_signal_1, output_statistics_signal_2);
 
-    output_mean_signal_1.print("1 stats: mean");
-    output_mean_signal_2.print("2 stats: mean");
-    output_stddev_signal_1.print("1 stats: stddev");
-    output_stddev_signal_2.print("2 stats: stddev");
+    // output_statistics_signal_1.print("1 stats: ");
+    // output_statistics_signal_2.print("2 stats: ");
+    features_cols = arma::join_cols(output_statistics_signal_1, output_statistics_signal_2);
+    features_matrix.insert_cols(features_matrix.n_cols, features_cols);
+  }
+  // Put one for now just to test
+  arma::rowvec class_id(10 /* this should be num_of_subsignals */, arma::fill::ones);
+  class_id.print("Class ID: ");
+  features_matrix.insert_rows(features_matrix.n_rows, class_id);
+  features_matrix.print("features: ");
+  // features_matrix = features_matrix.t();
+}
 
+void create_feature_matrix(std::vector<arma::mat>& dataset, arma::mat& feature_matrix)
+{
+  for (size_t i = 0; i < 8; ++i)
+  {
+    create_feature_matrix_per_class(dataset, feature_matrix);
+  }
+}
 
+int main(void)
+{
+  std::vector<arma::mat> dataset;
+  arma::mat features_matrix;
+  load_all_datasets(dataset, 1);
+  create_feature_matrix_per_class(dataset, features_matrix);
+
+  //Verify that the matrix is good.
+  features_matrix.save("extracted_features", arma::csv_ascii);
 }
