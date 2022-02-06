@@ -38,7 +38,7 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
   // all the classes
   if (class_num == 0)
   {
-    for (size_t  j=1; j < 11; ++j)
+    for (size_t  j=1; j < 12; ++j)
     {
       for (size_t i=1; i < 9; ++i)
       {
@@ -184,12 +184,13 @@ void prepare_signals(arma::mat& dataset, arma::vec& signal_1, arma::vec& signal_
   }
 }
 
-void create_feature_matrix_per_class(std::vector<arma::mat>& dataset, arma::mat& features_matrix)
+void create_feature_matrix_per_class(std::vector<arma::mat>& dataset, arma::mat& features_matrix, int class_num)
 {
   double size = dataset.at(0).n_rows;
   std::cout << "size of the first dataset " << size << std::endl;
   size_t num_of_subsignals = size / 1500;
   std::cout << "num_of_subsignals " << num_of_subsignals << std::endl;
+  std::cout << "Size of feature matrix (above): " << arma::size(features_matrix) << std::endl;
 
   arma::vec signal_1(1500, arma::fill::none);
   arma::vec signal_2(1500, arma::fill::none);
@@ -199,8 +200,11 @@ void create_feature_matrix_per_class(std::vector<arma::mat>& dataset, arma::mat&
   for (size_t j = 0; j < 8; ++j)
   {
     for (size_t i = 0; i < num_of_subsignals; ++i)
-    {
-      prepare_signals(dataset.at(j), signal_1, signal_2, i);
+    { 
+      // j + (class_num * 8) is to access the index of the matrix that contains the 
+      // files that has been loaded to each matrix, since we have only 8 files
+      // per class.
+      prepare_signals(dataset.at(j + ((class_num -1) * 8)), signal_1, signal_2, i);
    
       // Just for debugging.
       // signal_1.print("1");
@@ -213,22 +217,26 @@ void create_feature_matrix_per_class(std::vector<arma::mat>& dataset, arma::mat&
       // output_statistics_signal_1.print("1 stats: ");
       // output_statistics_signal_2.print("2 stats: ");
       features_cols = arma::join_cols(output_statistics_signal_1, output_statistics_signal_2);
+      arma::rowvec class_id( 1 /* this should be 8 * num_of_subsignals */, arma::fill::value(class_num));
+      features_cols.insert_rows(features_cols.n_rows, class_id);
+      // features_cols.print("Features cols:");
       features_matrix.insert_cols(features_matrix.n_cols, features_cols);
     }
   }
-  // Put one for now just to test
-  arma::rowvec class_id(10 /* this should be num_of_subsignals */, arma::fill::ones);
-  class_id.print("Class ID: ");
-  features_matrix.insert_rows(features_matrix.n_rows, class_id);
+  std::cout << "Size of feature matrix: " << arma::size(features_matrix) << std::endl;
+
+  // Adding the row at this level is causing an issue as the number of cols has increased.
+  // therefore the next iteration will fail as the number of cols has increased by one
+
   // features_matrix.print("features: "); // Keep for debugging
-  features_matrix = features_matrix.t();
+  //features_matrix = features_matrix.t();
 }
 
 void create_feature_matrix(std::vector<arma::mat>& dataset, arma::mat& feature_matrix)
 {
-  for (size_t i = 0; i < 8; ++i)
+  for (size_t i = 1; i < 12; ++i)
   {
-    create_feature_matrix_per_class(dataset, feature_matrix);
+    create_feature_matrix_per_class(dataset, feature_matrix, i);
   }
 }
 
@@ -236,9 +244,9 @@ int main(void)
 {
   std::vector<arma::mat> dataset;
   arma::mat features_matrix;
-  load_all_datasets(dataset, 1);
-  create_feature_matrix_per_class(dataset, features_matrix);
-
+  load_all_datasets(dataset, 0);
+  create_feature_matrix(dataset, features_matrix);
   //Verify that the matrix is good.
-  features_matrix.save("extracted_features", arma::csv_ascii);
+  features_matrix = features_matrix.t();
+  features_matrix.save("extracted_features.csv", arma::csv_ascii);
 }
