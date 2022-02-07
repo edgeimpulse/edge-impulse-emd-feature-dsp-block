@@ -138,6 +138,15 @@ Class 4 and 5 are not the same, they differ in the angle of the axis inclination
 * Which means that 15 ms is equal to 1500 lines of the first dataset.
 * As a result: each line of the UCI dataset is computed from 1500 lines of the raw dataset.
 
+### Our Dataset generated from the C++ DSP
+* The size of our dataset is 58608 line comapred to 58509 original one.
+* Currently our dataset does not contains the Skewness and the kurtoise
+* Our dataset contains 11 IMF instead of 3 IMF and res
+* Our algorithm is using ceemdan instead of the original emd algorithm.
+* Untill now the traning locally is not giving the extact same results achieved before,
+* The objectives is to move forward to get the same or a similar results.
+* The IMF and statistic features extractions is taking 36 hours of training.
+
 
 ### The current methods 
 
@@ -269,16 +278,16 @@ Useful links:
 
 **Short term objectives:**
 * [ ] Accuracy that need to be at least 98 percent for testing datasets.
-* [ ] Start working on the DSP block in C++ for fast computation
+* [X] Start working on the DSP block in C++ for fast computation
 * [ ] Get the Jupyter notebook code and try it locally
 * [ ] Try with local tests with different ML frameworks.
 * [ ] Use the RFE method to produce the 25 column datasets.
 * [ ] Try Knn, SVM locally with the RFE25 dataset
 
 **Long term objectives:**
-* [ ] We would like the run time to be fast, less care about memory
-* [ ] Objective to get the same 48 feature that we already have in the dataset
-* [ ] Window size requires optimization too.
+* [X] We would like the run time to be fast, less care about memory
+* [X] Objective to get the similar 48 feature that we already have in the dataset
+* [X] Window size requires optimization too.
 * [ ] Finally test the model on the Test bed 
 
 
