@@ -38,15 +38,15 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
   // all the classes
   if (class_num == 0)
   {
-    for (size_t  j=1; j < 12; ++j)
+    for (size_t j = 1; j < 12; ++j)
     {
-      for (size_t i=1; i < 9; ++i)
+      for (size_t i = 1; i < 9; ++i)
       {
         bool state =
         file.load("../../datasets/raw_datasets/Sensorless_Drive_Diagnosis_Data_Set/class"
         + std::to_string(j) + "/class" + std::to_string(j) + "_Parameterset" 
         + std::to_string(i) + ".txt");
-        std::cout << "Loading State: "<< state << " Loading class number: " << j << std::endl;
+        std::cout << "Loading State: "<< state << " Loading class number: " << j << " file num: " << i << std::endl;
         if (state == false)
         {
           //see later what to do
@@ -82,7 +82,7 @@ void Skewness(const arma::mat& imfs, const arma::vec& mean_signal, const arma::v
     {
       sum = (imfs.at(i, j) - mean_signal.at(i)) * (imfs.at(i, j) - mean_signal.at(i)) * (imfs.at(i, j) - mean_signal.at(i));
     }
-    skewness.at(i) = sum / (imfs.row(i).n_elem * stddev_signal.at(i) * stddev_signal.at(i) * stddev_signal.at(i) * stddev_signal.at(i));
+    skewness.at(i) = sum / (imfs.row(i).n_elem * stddev_signal.at(i) * stddev_signal.at(i) * stddev_signal.at(i));
   }
 }
 
@@ -159,8 +159,8 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
   arma::vec output_stddev_signal_1 = arma::stddev(output_arma_signal_1, 0, 1); // Check the data order
   arma::vec output_stddev_signal_2 = arma::stddev(output_arma_signal_2, 0, 1); // Check the data order
 
-  arma::vec skewness_signal_1(arma::size(output_arma_signal_1), arma::fill::none);
-  arma::vec skewness_signal_2(arma::size(output_arma_signal_2), arma::fill::none);
+  arma::vec skewness_signal_1(arma::size(output_mean_signal_1), arma::fill::none);
+  arma::vec skewness_signal_2(arma::size(output_mean_signal_2), arma::fill::none);
 
   Skewness(output_arma_signal_1, output_mean_signal_1, output_stddev_signal_1, skewness_signal_1);
   Skewness(output_arma_signal_2, output_mean_signal_2, output_stddev_signal_2, skewness_signal_2);
