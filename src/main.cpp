@@ -73,9 +73,17 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
   }
 }
 
-void Skewness(arma::vec& signal)
+void Skewness(const arma::mat& imfs, const arma::vec& mean_signal, const arma::vec& stddev_signal, arma::vec& skewness)
 {
-  
+  double sum = 0;
+  for (size_t i = 0; i < imfs.n_rows; ++i)
+  {
+    for (size_t j = 0; j < imfs.n_cols; ++j)
+    {
+      sum = (imfs.at(i, j) - mean_signal.at(i)) * (imfs.at(i, j) - mean_signal.at(i)) * (imfs.at(i, j) - mean_signal.at(i));
+    }
+    skewness.at(i) = sum / (imfs.row(i).n_elem * stddev_signal.at(i) * stddev_signal.at(i) * stddev_signal.at(i) * stddev_signal.at(i));
+  }
 }
 
 void Kurtoise(arma::vec& signal)
@@ -83,6 +91,7 @@ void Kurtoise(arma::vec& signal)
 
 
 }
+
 // This function constitutes the main functionality of
 // computing the IMF of the signals.
 // The signal matrix or vector, should be cut to 1500 and prepared for 
@@ -105,7 +114,7 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
   // C style. The reason for this is that the EMD library is written in C99
   // I had to modify some part of the library too to make compile with g++
   // In essence, the IMF code is the same.
-  // // I know this loop is stupid and can be avoided, I do remember that we can point
+  // I know this loop is stupid and can be avoided, I do remember that we can point
   // out a memory location and get a pointer from their directly from arma to anything 
   // else. I need to check how to do it.
   for (size_t i = 0; i < N; ++i)
@@ -150,9 +159,18 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
   arma::vec output_stddev_signal_1 = arma::stddev(output_arma_signal_1, 0, 1); // Check the data order
   arma::vec output_stddev_signal_2 = arma::stddev(output_arma_signal_2, 0, 1); // Check the data order
 
+  arma::vec skewness_signal_1(arma::size(output_arma_signal_1), arma::fill::none);
+  arma::vec skewness_signal_2(arma::size(output_arma_signal_2), arma::fill::none);
+
+  Skewness(output_arma_signal_1, output_mean_signal_1, output_stddev_signal_1, skewness_signal_1);
+  Skewness(output_arma_signal_2, output_mean_signal_2, output_stddev_signal_2, skewness_signal_2);
+
+  skewness_signal_1.print("Skewness");
+  skewness_signal_2.print("Skewness");
+
   output_statistics_signal_1 = arma::join_cols(output_mean_signal_1, output_stddev_signal_1);
   output_statistics_signal_2 = arma::join_cols(output_mean_signal_2, output_stddev_signal_2);
- 
+
   // Write output to file
   // First write the signals it self as the first line of the file
   // Second write the IMFs from the output variable to the same file
