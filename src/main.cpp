@@ -73,6 +73,16 @@ void load_all_datasets(std::vector<arma::mat>& datasets, int class_num)
   }
 }
 
+void Skewness(arma::vec& signal)
+{
+  
+}
+
+void Kurtoise(arma::vec& signal)
+{
+
+
+}
 // This function constitutes the main functionality of
 // computing the IMF of the signals.
 // The signal matrix or vector, should be cut to 1500 and prepared for 

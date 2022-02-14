@@ -1,8 +1,8 @@
 # If you're not using the Armadillo wrapper, replace `armadillo` with linker commands
 # for the BLAS and LAPACK libraries that you are using.
 
-TARGET := trial
-SRC := trial.cpp eemd.cpp
+TARGET := main
+SRC := main.cpp eemd.cpp
 LIBS_NAME := armadillo
 
 CXX := g++
