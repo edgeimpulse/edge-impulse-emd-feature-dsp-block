@@ -86,10 +86,17 @@ void Skewness(const arma::mat& imfs, const arma::vec& mean_signal, const arma::v
   }
 }
 
-void Kurtoise(arma::vec& signal)
+void Kurtoise(const arma::mat& imfs, const arma::vec& mean_signal, const arma::vec& stddev_signal, arma::vec& kurtoise)
 {
-
-
+  double sum = 0;
+  for (size_t i = 0; i < imfs.n_rows; ++i)
+  {
+    for (size_t j = 0; j < imfs.n_cols; ++j)
+    {
+      sum = (imfs.at(i, j) - mean_signal.at(i)) * (imfs.at(i, j) - mean_signal.at(i)) * (imfs.at(i, j) - mean_signal.at(i)) * (imfs.at(i, j) - mean_signal.at(i));
+    }
+    kurtoise.at(i) = (sum / (imfs.row(i).n_elem * stddev_signal.at(i) * stddev_signal.at(i) * stddev_signal.at(i) * stddev_signal.at(i))) - 3;
+  }
 }
 
 // This function constitutes the main functionality of
