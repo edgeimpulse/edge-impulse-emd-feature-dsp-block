@@ -169,14 +169,29 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
   arma::vec skewness_signal_1(arma::size(output_mean_signal_1), arma::fill::none);
   arma::vec skewness_signal_2(arma::size(output_mean_signal_2), arma::fill::none);
 
+  arma::vec kurtoise_signal_1(arma::size(output_mean_signal_1), arma::fill::none);
+  arma::vec kurtoise_signal_2(arma::size(output_mean_signal_2), arma::fill::none);
+
   Skewness(output_arma_signal_1, output_mean_signal_1, output_stddev_signal_1, skewness_signal_1);
   Skewness(output_arma_signal_2, output_mean_signal_2, output_stddev_signal_2, skewness_signal_2);
 
-  skewness_signal_1.print("Skewness");
-  skewness_signal_2.print("Skewness");
+  Kurtoise(output_arma_signal_1, output_mean_signal_1, output_stddev_signal_1, kurtoise_signal_1);
+  Kurtoise(output_arma_signal_2, output_mean_signal_2, output_stddev_signal_2, kurtoise_signal_2);
 
-  output_statistics_signal_1 = arma::join_cols(output_mean_signal_1, output_stddev_signal_1);
-  output_statistics_signal_2 = arma::join_cols(output_mean_signal_2, output_stddev_signal_2);
+  // skewness_signal_1.print("Skewness");
+  // skewness_signal_2.print("Skewness");
+  
+  // kurtoise_signal_1.print("Kurtoise");
+  // kurtoise_signal_2.print("Kurtoise");
+
+  arma::vec sk_kur_signal_1 = arma::join_cols(skewness_signal_1, kurtoise_signal_1);
+  arma::vec sk_kur_signal_2 = arma::join_cols(skewness_signal_2, kurtoise_signal_2);
+
+  arma::vec mean_stddev_signal_1 = arma::join_cols(output_mean_signal_1, output_stddev_signal_1);
+  arma::vec mean_stddev_signal_2 = arma::join_cols(output_mean_signal_2, output_stddev_signal_2);
+
+  output_statistics_signal_1 = arma::join_cols(mean_stddev_signal_1, sk_kur_signal_1);
+  output_statistics_signal_2 = arma::join_cols(mean_stddev_signal_2, sk_kur_signal_2);
 
   // Write output to file
   // First write the signals it self as the first line of the file
