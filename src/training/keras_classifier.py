@@ -38,17 +38,17 @@ def get_reshape_function(reshape_to):
         return tf.reshape(image, reshape_to), label
     return reshape
 
-callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=200, restore_best_weights=True)
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=250, restore_best_weights=True)
 initializer = tf.keras.initializers.GlorotNormal(seed=None)
 
 model = Sequential()
-model.add(Dense(180, activation='tanh',
+model.add(Dense(200, activation='tanh',
     activity_regularizer=tf.keras.regularizers.l1(0.00001), kernel_initializer=initializer))
 model.add(Dropout(0.2))
-model.add(Dense(300, activation='tanh',
+model.add(Dense(350, activation='tanh',
     activity_regularizer=tf.keras.regularizers.l1(0.00001), kernel_initializer=initializer))
 model.add(Dropout(0.2))
-model.add(Dense(180, activation='tanh',
+model.add(Dense(200, activation='tanh',
     activity_regularizer=tf.keras.regularizers.l1(0.00001), kernel_initializer=initializer))
 model.add(Dropout(0.2))
 model.add(Dense(12, activation='tanh',
