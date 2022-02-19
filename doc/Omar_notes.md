@@ -258,10 +258,27 @@ ANN Hyper parameters:
 * Epochs = Unlimited, controlled by early stop at min loss (callback)
 * Use tanh activation function, with softmax for last layer
 * layers (80, 180, 240, 180, 12)
-* Add three Dropout layer with 0.3 percentage of the dropout.
+* Add three Dropout layer with 0.2 percentage of the dropout.
 * Since the feature vector size is different, we have doubled the number of neurons in each hidden layer
 * Achieved accuracy on the testing dataset is 91 percent on only 2000 epochs
 
+**Version 2 Hyper parameters**
+ANN Hyper parameters:
+* Epochs = Unlimited, controlled by early stop at min loss on 200 (callback)
+* Use tanh activation function, with softmax for last layer
+* Layers (80, 180, 300, 180, 12)
+* Add three Dropout layer with 0.2 percentage of the dropout.
+* Since the feature vector size is different, we have doubled the number of neurons in each hidden layer
+* Achieved accuracy on the testing dataset is 93 percent.
+
+**Version 3 Hyper parameters**
+ANN Hyper parameters:
+* Epochs = Unlimited, controlled by early stop at min loss on 250 (callback)
+* Use tanh activation function, with softmax for last layer
+* Layers (80, 200, 350, 200, 12)
+* Add three Dropout layer with 0.2 percentage of the dropout.
+* Since the feature vector size is different, we have doubled the number of neurons in each hidden layer
+* Achieved accuracy on the testing dataset is 94 percent.
 
 Useful links:
 * Project link in the studio: https://studio.edgeimpulse.com/studio/38818
@@ -292,16 +309,17 @@ Useful links:
 | D2(v1)     |   FFN       |    M (EI treatment)|  98.5          |  96.59            |
 | D2(v2)     |   SVM       |    M   EI          |   66.40        |   ?               |
 | D2(v3)     |   FFN       |    M   EI          |   98.7         |  96.69            |
-| D3         |   FFN       |    Omar Datasets   |   88           |   91.2            |
-  
+| D3(v1)     |   FFN       |    Omar Datasets   |   88           |   91.2            |
+| D3(v2)     |   FFN       |    Omar Datasets   |   82 N dropout |   93              |
+| D3(v3)     |   FFN       |    Omar Datasets   |   84 N dropout |   94              |
 
 ### What do we need to optimize
 
 **Short term objectives:**
 * [ ] Accuracy that need to be at least 98 percent for testing datasets.
 * [X] Start working on the DSP block in C++ for fast computation
-* [ ] Get the Jupyter notebook code and try it locally
-* [ ] Try with local tests with different ML frameworks.
+* [X] Get the Jupyter notebook code and try it locally
+* [X] Try with local tests with different ML frameworks.
 * [ ] Use the RFE method to produce the 25 column datasets.
 * [ ] Try Knn, SVM locally with the RFE25 dataset
 
