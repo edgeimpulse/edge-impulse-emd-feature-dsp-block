@@ -10,9 +10,9 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import logging
 
-dataset = genfromtxt("../dataset/full_dataset_all_stats_features.csv", delimiter=',')
-X = dataset[:, 0:80]
-Y = dataset[:, 80:81]
+dataset = genfromtxt("../rfe/rfe_dataset.csv", delimiter=',')
+X = dataset[:, 0:42]
+Y = dataset[:, 42:43]
 
 print(X)
 print(Y)
