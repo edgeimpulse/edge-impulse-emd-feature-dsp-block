@@ -3,8 +3,6 @@
 #include <math.h>
 #include <gsl/gsl_math.h>
 #include <armadillo>
-#include <filesystem>
-#include <experimental/filesystem>
 
 #include "eemd.h"
 
@@ -193,35 +191,17 @@ void dsp_block(arma::vec& signal_1, arma::vec& signal_2, arma::vec& output_stati
   output_statistics_signal_1 = arma::join_cols(mean_stddev_signal_1, sk_kur_signal_1);
   output_statistics_signal_2 = arma::join_cols(mean_stddev_signal_2, sk_kur_signal_2);
 
-  // Write output to file
-  // First write the signals it self as the first line of the file
-  // Second write the IMFs from the output variable to the same file
-  // Finally the file contains the original signals and the IMFS and the res.
+  free(phase_1_input_vector);
+  phase_1_input_vector = NULL;
 
-  // The output to a file is not necessary for now, this can be removed later.
-  // Keep it now, it is good for debugging.
+  free(phase_2_input_vector); 
+  phase_2_input_vector = NULL;
 
-  // FILE* fp = fopen(outfile, "w");
-  // for (size_t j=0; j<N; j++)
-  // {
-  //   //fprintf(fp, "%f ", input_vector[j]);
-  // }
-  // fprintf(fp, "\n");
-  // for (size_t i=0; i<num_imfs; i++)
-  // {
-  //   for (size_t j=0; j<N; j++)
-  //   {
-  //     fprintf(fp, "%f ", output_phase_1[i*N+j]);
-  //   }
-  //   fprintf(fp, "\n");
-  // }
-  // printf("Done!\n");
-  // // Clean the memory before losing all the heap.
-  // fclose(fp);
-  free(phase_1_input_vector); phase_1_input_vector = NULL;
-  free(phase_2_input_vector); phase_2_input_vector = NULL;
-  free(output_phase_1); output_phase_1 = NULL;
-  free(output_phase_2); output_phase_2 = NULL;
+  free(output_phase_1); 
+  output_phase_1 = NULL;
+
+  free(output_phase_2); 
+  output_phase_2 = NULL;
 }
 
 // This function should prepare the signals and cut it into 15ms subsequent signals.
