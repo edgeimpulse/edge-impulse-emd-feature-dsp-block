@@ -14,7 +14,7 @@ public:
   FeatureGenerator();
 
   // This function should prepare the signals and cut it into 15ms subsequent signals.
-  void prepare_signals(arma::vec& signal_1, arma::vec& signal_2, int which_subsignals);
+  void generate_subsignals(arma::vec& signal_1, arma::vec& signal_2, int which_subsignals);
 
   void generate_feature_matrix_per_class(int class_num);
 

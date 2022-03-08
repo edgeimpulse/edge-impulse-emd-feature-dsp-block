@@ -1,8 +1,11 @@
 #include "generate_features.hpp"
 
-FeatureGenerator::FeatureGenerator();
+FeatureGenerator::FeatureGenerator()
+{
+  // Nothing to do here.
+}
 
-void FeatureGenerator::prepare_signals(int which_subsignals)
+void FeatureGenerator::generate_subsignals(int which_subsignals)
 {
   for(size_t i = 0; i < 1500; ++i)
   {
